@@ -1,0 +1,35 @@
+}
+function nextQuestion() {
+  if (!answered) return;
+  index++;
+  if (index >= order.length) showResult();
+  else renderQuestion();
+}
+function showResult() {
+  clearInterval(timerId);
+  $("quizCard").classList.add("hidden");
+  $("resultCard").classList.remove("hidden");
+  $("finalScore").textContent = `${score}/${order.length * 10}`;
+  $("correctCount").textContent = correct;
+  $("wrongCount").textContent = wrong;
+  $("accuracy").textContent = `${Math.round((correct / order.length) * 100)}%`;
+  if (correct >= 8) {
+    $("trophy").textContent = "🏆";
+    $("resultTitle").textContent = "कमाल कर दिया!";
+    $("resultMessage").textContent = "आपकी GK शानदार है! Keep it up!";
+  } else if (correct >= 5) {
+    $("trophy").textContent = "🥈";
+    $("resultTitle").textContent = "अच्छा प्रयास!";
+    $("resultMessage").textContent = "थोड़ी और प्रैक्टिस करें, अगली बार और बेहतर होगा।";
+  } else {
+    $("trophy").textContent = "📚";
+    $("resultTitle").textContent = "सीखना जारी रखें!";
+    $("resultMessage").textContent = "हर कोशिश से ज्ञान बढ़ता है। फिर से खेलें!";
+  }
+}
+$("nextBtn").addEventListener("click", nextQuestion);
+$("restartBtn").addEventListener("click", startGame);
+startGame();
+</script>
+</body>
+</html>
