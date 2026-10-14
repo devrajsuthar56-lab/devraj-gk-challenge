@@ -1,4 +1,249 @@
 }
+!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#090909">
+<title>Devraj GK Challenge</title>
+<style>
+  :root {
+    --bg: #090909;
+    --panel: #151515;
+    --panel2: #1d1b15;
+    --gold: #f5c451;
+    --gold2: #ffe39a;
+    --text: #f7f4eb;
+    --muted: #b7b1a2;
+    --green: #5bd39b;
+    --red: #ff7777;
+    --border: rgba(245,196,81,.25);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh; color: var(--text);
+    background: radial-gradient(ellipse at top, #29200d 0%, var(--bg) 48%);
+    font-family: system-ui, -apple-system, "Noto Sans Devanagari", Arial, sans-serif;
+    display: flex; justify-content: center; padding: 18px 12px 32px;
+  }
+  .app { width: 100%; max-width: 560px; }
+  header { text-align: center; padding: 12px 8px 20px; }
+  .logo {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 58px; height: 58px; border-radius: 18px;
+    border: 1px solid var(--gold); color: var(--gold);
+    font-size: 28px; background: linear-gradient(145deg,#2b2412,#101010);
+    box-shadow: 0 0 28px rgba(245,196,81,.12); margin-bottom: 10px;
+  }
+  h1 { margin: 0; font-size: clamp(25px, 7vw, 34px); letter-spacing: .3px; }
+  h1 span { color: var(--gold); }
+  .tagline { color: var(--muted); margin: 7px 0 0; font-size: 14px; }
+  .card {
+    background: linear-gradient(145deg, rgba(25,25,25,.98), rgba(16,16,16,.98));
+    border: 1px solid var(--border); border-radius: 22px; padding: 20px;
+    box-shadow: 0 16px 45px rgba(0,0,0,.28);
+  }
+  .topline { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:16px; }
+  .pill { border:1px solid var(--border); border-radius:999px; padding:7px 11px; font-size:12px; color:var(--gold2); background:#211c10; }
+  .score { font-size:13px; color:var(--muted); }
+  .score strong { color:var(--gold); font-size:17px; }
+  .progress-track { height:6px; background:#302c22; border-radius:99px; overflow:hidden; margin-bottom:18px; }
+  .progress { height:100%; width:0%; background:linear-gradient(90deg,var(--gold),var(--gold2)); transition:width .25s ease; }
+  .question-meta { display:flex; justify-content:space-between; gap:10px; color:var(--muted); font-size:12px; margin-bottom:10px; }
+  .timer { color:var(--gold); font-weight:800; }
+  .timer.danger { color:var(--red); }
+  h2 { font-size:clamp(20px,5vw,25px); line-height:1.45; margin:0 0 7px; }
+  .translation { color:var(--muted); font-size:14px; margin:0 0 20px; line-height:1.5; }
+  .options { display:grid; gap:10px; }
+  .option {
+    width:100%; text-align:left; color:var(--text); font:inherit; font-size:15px;
+    background:#1a1a1a; border:1px solid #38342a; border-radius:14px;
+    padding:14px 13px; cursor:pointer; display:flex; align-items:center; gap:12px;
+    min-height:56px; transition:transform .12s,border-color .12s,background .12s;
+  }
+  .option:active { transform:scale(.99); }
+  .letter { flex:0 0 30px; width:30px; height:30px; display:grid; place-items:center; border-radius:9px; background:#2a261b; color:var(--gold); font-weight:800; font-size:13px; }
+  .option.correct { border-color:var(--green); background:rgba(91,211,155,.12); }
+  .option.correct .letter { background:var(--green); color:#07140e; }
+  .option.wrong { border-color:var(--red); background:rgba(255,119,119,.1); }
+  .option.wrong .letter { background:var(--red); color:#220707; }
+  .option:disabled { cursor:default; }
+  .feedback { min-height:26px; margin:14px 0 0; color:var(--muted); font-size:14px; line-height:1.5; }
+  .feedback.good { color:var(--green); } .feedback.bad { color:var(--red); }
+  .actions { display:flex; gap:10px; margin-top:12px; }
+  .btn {
+    border:0; border-radius:13px; padding:14px 16px; font:inherit; font-weight:800;
+    cursor:pointer; width:100%;
+  }
+  .btn-primary { color:#1b1405; background:linear-gradient(135deg,var(--gold2),var(--gold)); }
+  .btn-secondary { color:var(--gold2); background:#242016; border:1px solid var(--border); }
+  .hidden { display:none !important; }
+  .result { text-align:center; padding:10px 0 2px; }
+  .trophy { font-size:52px; margin-bottom:8px; }
+  .result h2 { color:var(--gold); font-size:28px; margin-bottom:5px; }
+  .result p { color:var(--muted); line-height:1.6; }
+  .big-score { font-size:48px; font-weight:900; color:var(--gold2); margin:14px 0 2px; }
+  .stats { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin:20px 0; }
+  .stat { background:#1b1a16; border:1px solid var(--border); padding:12px 6px; border-radius:13px; }
+  .stat strong { display:block; color:var(--gold); font-size:20px; }
+  .stat span { color:var(--muted); font-size:11px; }
+  footer { color:#8d8779; text-align:center; font-size:12px; padding:18px 8px 0; line-height:1.6; }
+  @media (max-width:360px) { .card { padding:15px; } .option { padding:12px 10px; } }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="logo">GK</div>
+    <h1>Devraj <span>GK Challenge</span></h1>
+    <p class="tagline">ज्ञान बढ़ाओ • स्कोर बनाओ • Keep Learning</p>
+  </header>
+
+  <main class="card" id="quizCard">
+    <div class="topline">
+      <span class="pill" id="categoryPill">GENERAL KNOWLEDGE</span>
+      <div class="score">स्कोर / Score: <strong id="score">0</strong></div>
+    </div>
+    <div class="progress-track"><div class="progress" id="progress"></div></div>
+    <div class="question-meta">
+      <span id="questionCount">सवाल 1 / 10</span>
+      <span class="timer" id="timer">⏱ 15s</span>
+    </div>
+    <h2 id="questionHi">सवाल लोड हो रहा है...</h2>
+    <p class="translation" id="questionEn"></p>
+    <div class="options" id="options"></div>
+    <p class="feedback" id="feedback" aria-live="polite"></p>
+    <div class="actions">
+      <button class="btn btn-primary hidden" id="nextBtn">अगला सवाल / Next →</button>
+    </div>
+  </main>
+
+  <section class="card hidden" id="resultCard">
+    <div class="result">
+      <div class="trophy" id="trophy">🏆</div>
+      <h2 id="resultTitle">शानदार!</h2>
+      <p id="resultMessage">आपने क्विज़ पूरा कर लिया।</p>
+      <div class="big-score" id="finalScore">0/100</div>
+      <p>आपका अंतिम स्कोर / Your final score</p>
+      <div class="stats">
+        <div class="stat"><strong id="correctCount">0</strong><span>सही / Correct</span></div>
+        <div class="stat"><strong id="wrongCount">0</strong><span>गलत / Wrong</span></div>
+        <div class="stat"><strong id="accuracy">0%</strong><span>सटीकता / Accuracy</span></div>
+      </div>
+      <button class="btn btn-primary" id="restartBtn">फिर से खेलें / Play Again</button>
+    </div>
+  </section>
+  <footer>Devraj GK Challenge • सीखना जारी रखें!<br>यह शुरुआती डेमो है। स्कोर इस डिवाइस/सेशन में ही रखा जाता है।</footer>
+</div>
+
+<script>
+const QUESTIONS = [
+  {cat:"भारत / INDIA", hi:"भारत की राजधानी क्या है?", en:"What is the capital of India?", opts:["मुंबई / Mumbai","नई दिल्ली / New Delhi","जयपुर / Jaipur","लखनऊ / Lucknow"], answer:1, explain:"भारत की राजधानी नई दिल्ली है। / New Delhi is the capital of India."},
+  {cat:"विज्ञान / SCIENCE", hi:"पानी का रासायनिक सूत्र क्या है?", en:"What is the chemical formula of water?", opts:["CO₂","O₂","H₂O","NaCl"], answer:2, explain:"पानी का सूत्र H₂O है। / The formula of water is H₂O."},
+  {cat:"इतिहास / HISTORY", hi:"भारत स्वतंत्र कब हुआ?", en:"When did India become independent?", opts:["15 अगस्त 1947 / 15 Aug 1947","26 जनवरी 1950 / 26 Jan 1950","2 अक्टूबर 1947 / 2 Oct 1947","14 नवंबर 1948 / 14 Nov 1948"], answer:0, explain:"भारत 15 अगस्त 1947 को स्वतंत्र हुआ। / India became independent on 15 August 1947."},
+  {cat:"खेल / SPORTS", hi:"क्रिकेट टीम में मैदान पर एक टीम के कितने खिलाड़ी होते हैं?", en:"How many players from one team are on the field in cricket?", opts:["9","10","11","12"], answer:2, explain:"क्रिकेट में एक टीम के 11 खिलाड़ी मैदान पर होते हैं। / A cricket team has 11 players on the field."},
+  {cat:"अंतरिक्ष / SPACE", hi:"लाल ग्रह किसे कहा जाता है?", en:"Which planet is known as the Red Planet?", opts:["शुक्र / Venus","मंगल / Mars","बृहस्पति / Jupiter","बुध / Mercury"], answer:1, explain:"मंगल को लाल ग्रह कहा जाता है। / Mars is known as the Red Planet."},
+  {cat:"भारत / INDIA", hi:"भारत का राष्ट्रीय पशु कौन-सा है?", en:"What is the national animal of India?", opts:["शेर / Lion","हाथी / Elephant","बंगाल टाइगर / Bengal Tiger","तेंदुआ / Leopard"], answer:2, explain:"भारत का राष्ट्रीय पशु बंगाल टाइगर है। / India's national animal is the Bengal tiger."},
+  {cat:"विज्ञान / SCIENCE", hi:"पौधे अपना भोजन किस प्रक्रिया से बनाते हैं?", en:"By which process do plants make their food?", opts:["वाष्पीकरण / Evaporation","प्रकाश संश्लेषण / Photosynthesis","पाचन / Digestion","संघनन / Condensation"], answer:1, explain:"पौधे प्रकाश संश्लेषण से भोजन बनाते हैं। / Plants make food through photosynthesis."},
+  {cat:"भूगोल / GEOGRAPHY", hi:"दुनिया का सबसे बड़ा महासागर कौन-सा है?", en:"Which is the largest ocean in the world?", opts:["अटलांटिक / Atlantic","हिंद / Indian","आर्कटिक / Arctic","प्रशांत / Pacific"], answer:3, explain:"प्रशांत महासागर दुनिया का सबसे बड़ा महासागर है। / The Pacific Ocean is the largest."},
+  {cat:"सामान्य ज्ञान / GK", hi:"एक किलोमीटर में कितने मीटर होते हैं?", en:"How many metres are there in one kilometre?", opts:["100","500","1,000","10,000"], answer:2, explain:"एक किलोमीटर में 1,000 मीटर होते हैं। / One kilometre equals 1,000 metres."},
+  {cat:"भारत / INDIA", hi:"भारत का संविधान कब लागू हुआ?", en:"When did the Constitution of India come into effect?", opts:["15 अगस्त 1947 / 15 Aug 1947","26 जनवरी 1950 / 26 Jan 1950","26 नवंबर 1949 / 26 Nov 1949","2 अक्टूबर 1950 / 2 Oct 1950"], answer:1, explain:"संविधान 26 जनवरी 1950 को लागू हुआ। / It came into effect on 26 January 1950."}
+];
+
+const $ = id => document.getElementById(id);
+let order = [], index = 0, score = 0, correct = 0, wrong = 0, seconds = 15, timerId = null, answered = false;
+
+function shuffle(array) {
+  const a = [...array];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+function startGame() {
+  clearInterval(timerId);
+  order = shuffle(QUESTIONS);
+  index = 0; score = 0; correct = 0; wrong = 0;
+  $("score").textContent = score;
+  $("quizCard").classList.remove("hidden");
+  $("resultCard").classList.add("hidden");
+  renderQuestion();
+}
+function renderQuestion() {
+  clearInterval(timerId);
+  answered = false;
+  seconds = 15;
+  const q = order[index];
+  $("categoryPill").textContent = q.cat;
+  $("questionCount").textContent = `सवाल ${index + 1} / ${order.length} • Question ${index + 1} of ${order.length}`;
+  $("progress").style.width = `${(index / order.length) * 100}%`;
+  $("questionHi").textContent = q.hi;
+  $("questionEn").textContent = q.en;
+  $("timer").textContent = `⏱ ${seconds}s`;
+  $("timer").classList.remove("danger");
+  $("feedback").textContent = "";
+  $("feedback").className = "feedback";
+  $("nextBtn").classList.add("hidden");
+  const options = $("options");
+  options.innerHTML = "";
+  q.opts.forEach((opt, i) => {
+    const button = document.createElement("button");
+    button.className = "option";
+    button.innerHTML = `<span class="letter">${String.fromCharCode(65+i)}</span><span></span>`;
+    button.lastElementChild.textContent = opt;
+    button.addEventListener("click", () => chooseAnswer(i, button));
+    options.appendChild(button);
+  });
+  timerId = setInterval(() => {
+    seconds--;
+    $("timer").textContent = `⏱ ${seconds}s`;
+    if (seconds <= 5) $("timer").classList.add("danger");
+    if (seconds <= 0) {
+      clearInterval(timerId);
+      if (!answered) timeUp();
+    }
+  }, 1000);
+}
+function lockOptions() {
+  [...$("options").querySelectorAll("button")].forEach(b => b.disabled = true);
+}
+function chooseAnswer(choice, button) {
+  if (answered) return;
+  answered = true;
+  clearInterval(timerId);
+  lockOptions();
+  const q = order[index];
+  const buttons = [...$("options").querySelectorAll("button")];
+  buttons[q.answer].classList.add("correct");
+  if (choice === q.answer) {
+    score += 10; correct++;
+    $("feedback").textContent = "✅ सही जवाब! +10 अंक — " + q.explain;
+    $("feedback").classList.add("good");
+  } else {
+    wrong++;
+    button.classList.add("wrong");
+    $("feedback").textContent = "❌ गलत जवाब। " + q.explain;
+    $("feedback").classList.add("bad");
+  }
+  $("score").textContent = score;
+  showNextButton();
+}
+function timeUp() {
+  answered = true;
+  wrong++;
+  lockOptions();
+  const q = order[index];
+  [...$("options").querySelectorAll("button")][q.answer].classList.add("correct");
+  $("feedback").textContent = "⏰ समय समाप्त! " + q.explain;
+  $("feedback").classList.add("bad");
+  showNextButton();
+}
+function showNextButton() {
+  $("progress").style.width = `${((index + 1) / order.length) * 100}%`;
+  $("nextBtn").textContent = index === order.length - 1 ? "रिज़ल्ट देखें / See Result →" : "अगला सवाल / Next →";
+  $("nextBtn").classList.remove("hidden");
+}
 function nextQuestion() {
   if (!answered) return;
   index++;
@@ -27,9 +272,15 @@ function showResult() {
     $("resultMessage").textContent = "हर कोशिश से ज्ञान बढ़ता है। फिर से खेलें!";
   }
 }
-$("nextBtn").addEventListener("click", nextQuestion);
-$("restartBtn").addEventListener("click", startGame);
-startGame();
-</script>
-</body>
-</html>
+$  .trophy { font-size:52px; margin-bottom:8px; }
+  .result h2 { color:var(--gold); font-size:28px; margin-bottom:5px; }
+  .result p { color:var(--muted); line-height:1.6; }
+  .big-score { font-size:48px; font-weight:900; color:var(--gold2); margin:14px 0 2px; }
+  .stats { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin:20px 0; }
+  .stat { background:#1b1a16; border:1px solid var(--border); padding:12px 6px; border-radius:13px; }
+  .stat strong { display:block; color:var(--gold); font-size:20px; }
+  .stat span { color:var(--muted); font-size:11px; }
+  footer { color:#8d8779; text-align:center; font-size:12px; padding:18px 8px 0; line-height:1.6; }
+  @media (max-width:360px) { .card { padding:15px; } .option { padding:12px 10px; } }
+</  }
+  $("
